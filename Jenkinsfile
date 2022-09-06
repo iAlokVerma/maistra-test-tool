@@ -17,6 +17,11 @@ properties([
             description: 'OCP Server URL'
         ),
         string(
+            name: 'MAISTRA_VERSION',
+            defaultValue: '2.2',
+            description: 'Maistra image version'
+        ),
+        string(
             name: 'OCP_CRED_ID',
             defaultValue: 'jenkins-ocp-auto',
             description: 'Jenkins credentials ID for OCP cluster. When set this, it takes precedence over OCP_TOKEN.'
@@ -97,7 +102,7 @@ if (OCP_API_URL == "") {
                         -e NIGHTLY='${params.NIGHTLY}' \
                         -e ROSA='${params.ROSA}' \
                         -e GODEBUG=x509ignoreCN=0 \
-                        quay.io/maistra/maistra-test-tool:2.2;
+                        quay.io/maistra/maistra-test-tool:${MAISTRA_VERSION};
                         else echo 'Skip';
                         fi
                     """,
@@ -129,7 +134,7 @@ if (OCP_API_URL == "") {
                         -e ROSA='${params.ROSA}' \
                         -e GODEBUG=x509ignoreCN=0 \
                         --entrypoint "../scripts/pipeline/run_one_test.sh" \
-                        quay.io/maistra/maistra-test-tool:2.2;
+                        quay.io/maistra/maistra-test-tool:${MAISTRA_VERSION};
                         fi
                     """,
                     returnStdout: true
