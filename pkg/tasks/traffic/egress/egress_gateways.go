@@ -30,6 +30,7 @@ func cleanupEgressGateways() {
 	util.KubeDeleteContents("bookinfo", util.RunTemplate(ExGatewayTemplate, smcp))
 	util.KubeDeleteContents("bookinfo", ExServiceEntryTLS)
 	util.KubeDeleteContents("bookinfo", ExServiceEntry)
+	util.KubeDeleteContents("bookinfo", CiscoProxy)
 	sleep.Uninstall()
 	time.Sleep(time.Duration(20) * time.Second)
 }
@@ -46,12 +47,15 @@ func TestEgressGateways(t *testing.T) {
 
 	t.Run("TrafficManagement_egress_gateway_for_http_traffic", func(t *testing.T) {
 		defer util.RecoverPanic(t)
+		util.Log.Info("Create a ServiceEntry for cisco proxy")
+		util.KubeApplyContents("bookinfo", CiscoProxy)
+		time.Sleep(time.Duration(10) * time.Second)
 
 		util.Log.Info("Create a ServiceEntry to external istio.io")
 		util.KubeApplyContents("bookinfo", ExServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -sSL -o /dev/null -D - http://istio.io`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") {
@@ -65,7 +69,7 @@ func TestEgressGateways(t *testing.T) {
 		util.KubeApplyContents("bookinfo", util.RunTemplate(ExGatewayTemplate, smcp))
 		time.Sleep(time.Duration(20) * time.Second)
 
-		command = `curl -sSL -o /dev/null -D - http://istio.io`
+		command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
 		msg, err = util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") {
@@ -87,7 +91,7 @@ func TestEgressGateways(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntryTLS)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -sSL -o /dev/null -D - https://istio.io`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - https://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || !strings.Contains(msg, "200") {
@@ -101,7 +105,7 @@ func TestEgressGateways(t *testing.T) {
 		util.KubeApplyContents("bookinfo", util.RunTemplate(ExGatewayHTTPSTemplate, smcp))
 		time.Sleep(time.Duration(20) * time.Second)
 
-		command = `curl -sSL -o /dev/null -D - https://istio.io`
+		command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - https://istio.io`
 		msg, err = util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || !strings.Contains(msg, "200") {

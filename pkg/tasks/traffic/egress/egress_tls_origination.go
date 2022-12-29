@@ -54,7 +54,7 @@ func TestEgressTLSOrigination(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -sSL -o /dev/null -D - http://istio.io`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") {

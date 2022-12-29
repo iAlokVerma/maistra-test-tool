@@ -27,6 +27,7 @@ func cleanupEgressWildcard() {
 	util.Log.Info("Cleanup")
 	util.KubeDeleteContents("bookinfo", util.RunTemplate(EgressWildcardGatewayTemplate, smcp))
 	util.KubeDeleteContents("bookinfo", EgressWildcardEntry)
+	util.KubeDeleteContents("bookinfo", CiscoProxy)
 	sleep := examples.Sleep{"bookinfo"}
 	sleep.Uninstall()
 	time.Sleep(time.Duration(20) * time.Second)
@@ -35,7 +36,9 @@ func cleanupEgressWildcard() {
 func TestEgressWildcard(t *testing.T) {
 	defer cleanupEgressWildcard()
 	defer util.RecoverPanic(t)
-
+	util.Log.Info("Create a ServiceEntry for cisco proxy")
+        util.KubeApplyContents("bookinfo", CiscoProxy)
+	time.Sleep(time.Duration(10) * time.Second)
 	util.Log.Info("Test Egress Wildcard Hosts")
 	sleep := examples.Sleep{"bookinfo"}
 	sleep.Install()
@@ -49,7 +52,7 @@ func TestEgressWildcard(t *testing.T) {
 		util.KubeApplyContents("bookinfo", EgressWildcardEntry)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -s https://en.wikipedia.org/wiki/Main_Page | grep -o "<title>.*</title>"; curl -s https://de.wikipedia.org/wiki/Wikipedia:Hauptseite | grep -o "<title>.*</title>"`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -s https://en.wikipedia.org/wiki/Main_Page | grep -o "<title>.*</title>"; curl --proxy http://proxy.esl.cisco.com:80 -s https://de.wikipedia.org/wiki/Wikipedia:Hauptseite | grep -o "<title>.*</title>"`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "<title>Wikipedia, the free encyclopedia</title>\n<title>Wikipedia – Die freie Enzyklopädie</title>") {
@@ -69,7 +72,7 @@ func TestEgressWildcard(t *testing.T) {
 		util.KubeApplyContents("bookinfo", util.RunTemplate(EgressWildcardGatewayTemplate, smcp))
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -s https://en.wikipedia.org/wiki/Main_Page | grep -o "<title>.*</title>"; curl -s https://de.wikipedia.org/wiki/Wikipedia:Hauptseite | grep -o "<title>.*</title>"`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -s https://en.wikipedia.org/wiki/Main_Page | grep -o "<title>.*</title>"; curl --proxy http://proxy.esl.cisco.com:80 -s https://de.wikipedia.org/wiki/Wikipedia:Hauptseite | grep -o "<title>.*</title>"`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "<title>Wikipedia, the free encyclopedia</title>\n<title>Wikipedia – Die freie Enzyklopädie</title>") {
