@@ -28,6 +28,7 @@ func cleanupEgressTLSOrigination() {
 	sleep := examples.Sleep{"bookinfo"}
 	util.KubeDeleteContents("bookinfo", ExServiceEntryOriginate)
 	util.KubeDeleteContents("bookinfo", ExServiceEntry)
+	util.KubeDeleteContents("bookinfo", CiscoProxy)
 	sleep.Uninstall()
 	time.Sleep(time.Duration(20) * time.Second)
 }
@@ -44,6 +45,10 @@ func TestEgressTLSOrigination(t *testing.T) {
 
 	t.Run("TrafficManagement_egress_configure_access_to_external_service", func(t *testing.T) {
 		defer util.RecoverPanic(t)
+
+		util.Log.Info("Create a ServiceEntry for cisco proxy")
+		util.KubeApplyContents("bookinfo", CiscoProxy)
+		time.Sleep(time.Duration(10) * time.Second)
 
 		util.Log.Info("Create a ServiceEntry to external istio.io")
 		util.KubeApplyContents("bookinfo", ExServiceEntry)
@@ -67,7 +72,7 @@ func TestEgressTLSOrigination(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntryOriginate)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl -sSL -o /dev/null -D - http://istio.io`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || strings.Contains(msg, "503 Service Unavailable") {
@@ -77,7 +82,7 @@ func TestEgressTLSOrigination(t *testing.T) {
 			util.Log.Infof("Success. Get http://istio.io response: %s", msg)
 		}
 
-		command = `curl -sSL -o /dev/null -D - https://istio.io`
+		command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - https://istio.io`
 		msg, err = util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || strings.Contains(msg, "503 Service Unavailable") {

@@ -29,6 +29,7 @@ func cleanupAccessExternalServices() {
 	util.KubeDeleteContents("bookinfo", httpbinextTimeout)
 	util.KubeDeleteContents("bookinfo", redhatextServiceEntry)
 	util.KubeDeleteContents("bookinfo", httbinextServiceEntry)
+	util.KubeDeleteContents("bookinfo", CiscoProxy)
 	sleep.Uninstall()
 	time.Sleep(time.Duration(20) * time.Second)
 }
@@ -45,10 +46,13 @@ func TestAccessExternalServices(t *testing.T) {
 
 	t.Run("TrafficManagement_egress_envoy_passthrough_to_external_services", func(t *testing.T) {
 		defer util.RecoverPanic(t)
+		util.Log.Info("Create a ServiceEntry for cisco proxy")
+		util.KubeApplyContents("bookinfo", CiscoProxy)
+		time.Sleep(time.Duration(10) * time.Second)
 
 		util.Log.Info("Skip checking the meshConfig outboundTrafficPolicy mode")
 		util.Log.Info("make requests to external https services")
-		command := `curl -sSI https://www.redhat.com/en | grep  "HTTP/"`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSI https://www.redhat.com/en | grep  "HTTP/"`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "200") {
@@ -66,7 +70,7 @@ func TestAccessExternalServices(t *testing.T) {
 		util.Log.Info("Create a ServiceEntry to external httpbin")
 		util.KubeApplyContents("bookinfo", httbinextServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
-		command := `curl -sS http://httpbin.org/headers`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sS http://httpbin.org/headers`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		if err != nil {
 			util.Log.Infof("Error response: %s", msg)
@@ -82,7 +86,7 @@ func TestAccessExternalServices(t *testing.T) {
 		util.Log.Info("Create a ServiceEntry to external https://www.redhat.com/en")
 		util.KubeApplyContents("bookinfo", redhatextServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
-		command := `curl -sSI https://www.redhat.com/en | grep  "HTTP/"`
+		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSI https://www.redhat.com/en | grep  "HTTP/"`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "200") {

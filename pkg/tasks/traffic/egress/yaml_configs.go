@@ -622,4 +622,20 @@ spec:
     protocol: HTTPS
   resolution: DNS
 `
+	CiscoProxy = `
+apiVersion: networking.istio.io/v1beta1
+kind: ServiceEntry
+metadata:
+  name: proxy
+spec:
+  hosts:
+  - proxy.esl.cisco.com
+  addresses:
+  - 173.36.224.109/32
+  ports:
+  - number: 80
+    name: tcp
+    protocol: TCP
+  location: MESH_EXTERNAL
+`
 )
