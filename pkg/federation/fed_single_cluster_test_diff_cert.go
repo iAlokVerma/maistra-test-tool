@@ -24,8 +24,8 @@ import (
 
 func cleanupSingleClusterFedDiffCert() {
 	util.Log.Info("Cleanup ...")
-	util.Shell(`kubectl -n mesh1-system delete secret cacerts`)
-	util.Shell(`pushd ../testdata/examples/federation \
+	util.BashShell(`kubectl -n mesh1-system delete secret cacerts`)
+	util.BashShell(`pushd ../testdata/examples/federation \
 			&& export MESH1_KUBECONFIG=~/.kube/config \
 			&& export MESH2_KUBECONFIG=~/.kube/config \
 			&& ./cleanup.sh`)
@@ -40,7 +40,7 @@ func TestSingleClusterFedDiffCert(t *testing.T) {
 		util.Log.Info("Test federation install in a single cluster")
 		util.Log.Info("Reference: https://github.com/maistra/istio/blob/maistra-2.1/pkg/servicemesh/federation/example/config-poc/install.sh")
 		util.Log.Info("Running install_diff_cert.sh waiting 1 min...")
-		util.Shell(`pushd ../testdata/examples/federation \
+		util.BashShell(`pushd ../testdata/examples/federation \
 			&& export MESH1_KUBECONFIG=~/.kube/config \
 			&& export MESH2_KUBECONFIG=~/.kube/config \
 			&& ./install_diff_cert.sh`)
@@ -49,7 +49,7 @@ func TestSingleClusterFedDiffCert(t *testing.T) {
 		time.Sleep(time.Duration(120) * time.Second)
 
 		util.Log.Info("Verify mesh1 connection status")
-		msg, err := util.Shell(`oc -n mesh1-system get servicemeshpeer mesh2 -o json`)
+		msg, err := util.BashShell(`oc -n mesh1-system get servicemeshpeer mesh2 -o json`)
 		if err != nil {
 			t.Error("Failed to get servicemeshpeer in mesh1-system")
 			util.Log.Error("Failed to get servicemeshpeer in mesh1-system")
@@ -62,7 +62,7 @@ func TestSingleClusterFedDiffCert(t *testing.T) {
 		}
 
 		util.Log.Info("Verify mesh2 connection status")
-		msg, err = util.Shell(`oc -n mesh2-system get servicemeshpeer mesh1 -o json`)
+		msg, err = util.BashShell(`oc -n mesh2-system get servicemeshpeer mesh1 -o json`)
 		if err != nil {
 			t.Error("Failed to get servicemeshpeer in mesh2-system")
 			util.Log.Error("Failed to get servicemeshpeer in mesh2-system")
@@ -75,7 +75,7 @@ func TestSingleClusterFedDiffCert(t *testing.T) {
 		}
 
 		util.Log.Info("Verify if services from mesh1 are imported into mesh2")
-		msg, err = util.Shell(`oc -n mesh2-system get importedservicesets mesh1 -o json`)
+		msg, err = util.BashShell(`oc -n mesh2-system get importedservicesets mesh1 -o json`)
 		if err != nil {
 			t.Error("Failed to find services from mesh1 to mesh2")
 			util.Log.Error("Failed to find services from mesh1 to mesh2")

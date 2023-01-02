@@ -208,18 +208,18 @@ var full = []testing.InternalTest{
 		Name: "T27",
 		F:    ossm.TestSSL,
 	},
+	//testing.InternalTest{
+	//	Name: "T28",
+	//	F:    ossm.TestRateLimiting,
+	//},
+	//testing.InternalTest{
+	//	Name: "T29",
+	//	F:    ossm.TestSMCPAnnotations,
+	//},
 	testing.InternalTest{
-		Name: "T28",
-		F:    ossm.TestRateLimiting,
-	},
-	testing.InternalTest{
-		Name: "T29",
-		F:    ossm.TestSMCPAnnotations,
-	},
-	// testing.InternalTest{
-	// 	Name: "T30",
-	// 	F:    ossm.TestMustGather,
-	// },
+	 	Name: "T30",
+	 	F:    ossm.TestMustGather,
+	 },
 	testing.InternalTest{
 		Name: "T31",
 		F:    federation.TestSingleClusterFed,

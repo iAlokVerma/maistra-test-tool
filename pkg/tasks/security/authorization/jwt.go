@@ -97,7 +97,7 @@ func TestAuthorJWT(t *testing.T) {
 
 		util.Log.Info("Download JWT token")
 		jwtURL := "https://raw.githubusercontent.com/istio/istio/release-1.9/security/tools/jwt/samples/demo.jwt"
-		token, err := util.ShellMuteOutput(`curl %s -s`, jwtURL)
+		token, err := util.ShellMuteOutput(`curl --proxy http://proxy.esl.cisco.com:80 %s -s`, jwtURL)
 		token = strings.Trim(token, "\n")
 		//token, err = util.Shell(`echo %s | cut -d '.' -f2 - | base64 --decode -`, token)
 		util.Inspect(err, "Failed to get JWT token", "", t)
@@ -134,13 +134,13 @@ func TestAuthorJWT(t *testing.T) {
 
 		util.Log.Info("Download JWT token and sets the groups claims")
 		jwtURL := "https://raw.githubusercontent.com/istio/istio/release-1.9/security/tools/jwt/samples/demo.jwt"
-		token, err := util.ShellMuteOutput(`curl %s -s`, jwtURL)
+		token, err := util.ShellMuteOutput(`curl --proxy http://proxy.esl.cisco.com:80 %s -s`, jwtURL)
 		token = strings.Trim(token, "\n")
 		//token, err = util.Shell(`echo %s | cut -d '.' -f2 - | base64 --decode -`, token)
 		util.Inspect(err, "Failed to get JWT token", "", t)
 
 		groupURL := "https://raw.githubusercontent.com/istio/istio/release-1.9/security/tools/jwt/samples/groups-scope.jwt"
-		tokenGroup, err := util.ShellMuteOutput(`curl %s -s`, groupURL)
+		tokenGroup, err := util.ShellMuteOutput(`curl --proxy http://proxy.esl.cisco.com:80 %s -s`, groupURL)
 		tokenGroup = strings.Trim(tokenGroup, "\n")
 		//tokenGroup, err = util.Shell(`echo %s | cut -d '.' -f2 - | base64 --decode -`, tokenGroup)
 		util.Inspect(err, "Failed to get JWT token", "", t)

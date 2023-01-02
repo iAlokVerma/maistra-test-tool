@@ -273,7 +273,7 @@ func TestAuthPolicy(t *testing.T) {
 
 		util.Log.Info("Attaching the valid token")
 		jwtURL := "https://raw.githubusercontent.com/istio/istio/release-1.9/security/tools/jwt/samples/demo.jwt"
-		token, err := util.ShellSilent("curl %s -s", jwtURL)
+		token, err := util.ShellSilent("curl --proxy http://proxy.esl.cisco.com:80 %s -s", jwtURL)
 		token = strings.Trim(token, "\n")
 		util.Inspect(err, "Failed to get JWT token", "", t)
 

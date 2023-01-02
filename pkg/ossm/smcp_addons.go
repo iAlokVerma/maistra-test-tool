@@ -25,7 +25,7 @@ func TestSMCPAddons(t *testing.T) {
 	t.Run("smcp_test_addons_3scale", func(t *testing.T) {
 		defer util.RecoverPanic(t)
 		util.Log.Info("Enable 3scale in a CR. Expected validation error.")
-		_, err := util.Shell(`kubectl patch -n %s smcp/%s --type merge -p '{"spec":{"addons":{"3scale":{"enabled":true}}}}'`, meshNamespace, smcpName)
+		_, err := util.BashShell(`kubectl patch -n %s smcp/%s --type merge -p '{"spec":{"addons":{"3scale":{"enabled":true}}}}'`, meshNamespace, smcpName)
 		if err != nil {
 			util.Log.Info("Expected validation error")
 		} else {

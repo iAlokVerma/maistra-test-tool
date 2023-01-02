@@ -23,7 +23,7 @@ import (
 	"github.com/maistra/maistra-test-tool/pkg/util"
 )
 
-var mustGatherImage = "registry.redhat.io/openshift-service-mesh/istio-must-gather-rhel8"
+var mustGatherImage = "registry.redhat.io/openshift-service-mesh/istio-must-gather-rhel8:2.0"
 
 func cleanupMustGatherTest() {
 	util.Log.Info("Cleanup ...")
