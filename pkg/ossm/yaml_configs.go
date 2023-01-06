@@ -27,6 +27,21 @@ spec:
     sampling: 10000
   policy:
     type: Istiod
+  proxy:
+    injection:
+      autoInject: false
+      injectedAnnotations:
+        test1.annotation-from-smcp: test1
+        test2.annotation-from-smcp: '[test2]'
+        test3.annotation-from-smcp: '{test3}'
+  runtime:
+    components:
+      pilot:
+        container:
+          env:
+            HTTP_PROXY: proxy.esl.cisco.com:80
+            HTTPS_PROXY: proxy.esl.cisco.com:80
+            NO_PROXY: .apps.ocp410.ocplab.local,.cluster.local,.ocp410.ocplab.local,.ocplab.local,.svc,10.2.0.0/16,10.30.120.180,10.30.120.20,10.30.120.6,127.0.0.1,172.30.0.0/16,172.30.0.1,172.30.0.10,192.168.55.0/24,api-int.ocp410.ocplab.local,hypf-vc65.noiro.lab,localhost,noiro-quay.cisco.com,.istio-system
   addons:
     grafana:
       enabled: true
@@ -54,6 +69,21 @@ spec:
     sampling: 10000
   policy:
     type: Istiod
+  proxy:
+    injection:
+      autoInject: false
+      injectedAnnotations:
+        test1.annotation-from-smcp: test1
+        test2.annotation-from-smcp: '[test2]'
+        test3.annotation-from-smcp: '{test3}'
+  runtime:
+    components:
+      pilot:
+        container:
+          env:
+            HTTP_PROXY: proxy.esl.cisco.com:80
+            HTTPS_PROXY: proxy.esl.cisco.com:80
+            NO_PROXY: .apps.ocp410.ocplab.local,.cluster.local,.ocp410.ocplab.local,.ocplab.local,.svc,10.2.0.0/16,10.30.120.180,10.30.120.20,10.30.120.6,127.0.0.1,172.30.0.0/16,172.30.0.1,172.30.0.10,192.168.55.0/24,api-int.ocp410.ocplab.local,hypf-vc65.noiro.lab,localhost,noiro-quay.cisco.com,.istio-system
   addons:
     grafana:
       enabled: true
@@ -81,6 +111,21 @@ spec:
     sampling: 10000
   policy:
     type: Istiod
+  proxy:
+    injection:
+      autoInject: false
+      injectedAnnotations:
+        test1.annotation-from-smcp: test1
+        test2.annotation-from-smcp: '[test2]'
+        test3.annotation-from-smcp: '{test3}'
+  runtime:
+    components:
+      pilot:
+        container:
+          env:
+            HTTP_PROXY: proxy.esl.cisco.com:80
+            HTTPS_PROXY: proxy.esl.cisco.com:80
+            NO_PROXY: .apps.ocp410.ocplab.local,.cluster.local,.ocp410.ocplab.local,.ocplab.local,.svc,10.2.0.0/16,10.30.120.180,10.30.120.20,10.30.120.6,127.0.0.1,172.30.0.0/16,172.30.0.1,172.30.0.10,192.168.55.0/24,api-int.ocp410.ocplab.local,hypf-vc65.noiro.lab,localhost,noiro-quay.cisco.com,.istio-system
   addons:
     grafana:
       enabled: true
@@ -109,6 +154,21 @@ spec:
     sampling: 10000
   policy:
     type: Istiod
+  proxy:
+    injection:
+      autoInject: false
+      injectedAnnotations:
+        test1.annotation-from-smcp: test1
+        test2.annotation-from-smcp: '[test2]'
+        test3.annotation-from-smcp: '{test3}'
+  runtime:
+    components:
+      pilot:
+        container:
+          env:
+            HTTP_PROXY: proxy.esl.cisco.com:80
+            HTTPS_PROXY: proxy.esl.cisco.com:80
+            NO_PROXY: .apps.ocp410.ocplab.local,.cluster.local,.ocp410.ocplab.local,.ocplab.local,.svc,10.2.0.0/16,10.30.120.180,10.30.120.20,10.30.120.6,127.0.0.1,172.30.0.0/16,172.30.0.1,172.30.0.10,192.168.55.0/24,api-int.ocp410.ocplab.local,hypf-vc65.noiro.lab,localhost,noiro-quay.cisco.com,.istio-system
   addons:
     grafana:
       enabled: true
