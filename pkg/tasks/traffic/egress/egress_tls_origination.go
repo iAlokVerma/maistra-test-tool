@@ -42,6 +42,9 @@ func TestEgressTLSOrigination(t *testing.T) {
 	sleep.Install()
 	sleepPod, err := util.GetPodName("bookinfo", "app=sleep")
 	util.Inspect(err, "Failed to get sleep pod name", "", t)
+	util.BashShell(`kubectl cp /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
+	//command := `curl http://istio.io/ca-cert.pem >> /tmp/ca-cert.pem`
+	//msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 
 	t.Run("TrafficManagement_egress_configure_access_to_external_service", func(t *testing.T) {
 		defer util.RecoverPanic(t)
@@ -54,7 +57,8 @@ func TestEgressTLSOrigination(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		//command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		command := `curl -sSL --cacert /tmp/ca-cert.pem -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") {
@@ -72,7 +76,8 @@ func TestEgressTLSOrigination(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntryOriginate)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		//command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		command := `curl -sSL -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || strings.Contains(msg, "503 Service Unavailable") {
@@ -82,7 +87,8 @@ func TestEgressTLSOrigination(t *testing.T) {
 			util.Log.Infof("Success. Get http://istio.io response: %s", msg)
 		}
 
-		command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - https://istio.io`
+		//command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - https://istio.io`
+		command = `curl -k --cacert /tmp/ca-cert.pem -sSL -o /dev/null -D - https://istio.io`
 		msg, err = util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || strings.Contains(msg, "503 Service Unavailable") {

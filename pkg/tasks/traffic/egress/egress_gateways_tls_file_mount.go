@@ -104,6 +104,7 @@ func TestTLSOriginationFileMount(t *testing.T) {
 	util.Log.Info("Create a ServiceEntry for cisco proxy")
 	util.KubeApplyContents("bookinfo", CiscoProxy)
 	time.Sleep(time.Duration(10) * time.Second)
+	util.BashShell(`kubectl cp /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
 
 	t.Run("TrafficManagement_egress_gateway_perform_TLS_origination", func(t *testing.T) {
 		defer util.RecoverPanic(t)
@@ -112,7 +113,8 @@ func TestTLSOriginationFileMount(t *testing.T) {
 		util.KubeApplyContents("bookinfo", ExServiceEntry)
 		time.Sleep(time.Duration(10) * time.Second)
 
-		command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		//command := `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		command := `curl -sSL --cacert /tmp/ca-cert.pem -o /dev/null -D - http://istio.io`
 		msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") {
@@ -126,7 +128,8 @@ func TestTLSOriginationFileMount(t *testing.T) {
 		util.KubeApplyContents("bookinfo", util.RunTemplate(ExGatewayTLSFileTemplate, smcp))
 		time.Sleep(time.Duration(20) * time.Second)
 
-		command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		//command = `curl --proxy http://proxy.esl.cisco.com:80 -sSL -o /dev/null -D - http://istio.io`
+		command = `curl -sSL --cacert /tmp/ca-cert.pem -o /dev/null -D - http://istio.io`
 		msg, err = util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 		util.Inspect(err, "Failed to get response", "", t)
 		if strings.Contains(msg, "301 Moved Permanently") || !strings.Contains(msg, "200") {
