@@ -51,7 +51,7 @@ func TestTLSOriginationSDS(t *testing.T) {
 	util.Log.Info("Create a ServiceEntry for cisco proxy")
 	util.KubeApplyContents("bookinfo", CiscoProxy)
 	time.Sleep(time.Duration(10) * time.Second)
-	util.BashShell(`kubectl cp /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
+	util.BashShell(`kubectl cp -n bookinfo /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
 
 	t.Run("TrafficManagement_egress_gateway_perform_TLS_origination", func(t *testing.T) {
 		defer util.RecoverPanic(t)

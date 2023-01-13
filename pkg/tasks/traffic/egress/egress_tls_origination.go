@@ -42,7 +42,7 @@ func TestEgressTLSOrigination(t *testing.T) {
 	sleep.Install()
 	sleepPod, err := util.GetPodName("bookinfo", "app=sleep")
 	util.Inspect(err, "Failed to get sleep pod name", "", t)
-	util.BashShell(`kubectl cp /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
+	util.BashShell(`kubectl cp -n bookinfo /home/noiro/http_server/ca-cert.pem %s:/tmp/ -c sleep`,sleepPod)
 	//command := `curl http://istio.io/ca-cert.pem >> /tmp/ca-cert.pem`
 	//msg, err := util.PodExec("bookinfo", sleepPod, "sleep", command, false)
 
